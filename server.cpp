@@ -29,7 +29,7 @@ int main()
 	ListenSockAddr.sin_addr.s_addr = INADDR_ANY;
 	ListenSockAddr.sin_port = htons(40211);
 
-	Result = bind(ListenSocket, (SOCKADDR*)&ListenSocket, sizeof(ListenSockAddr));
+	Result = bind(ListenSocket, (SOCKADDR*)&ListenSockAddr, sizeof(ListenSockAddr));
 	if (Result == SOCKET_ERROR)
 	{
 		cout << "can't bind : " << GetLastError() << endl;
