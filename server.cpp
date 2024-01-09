@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <WinSock2.h>
 
@@ -7,6 +9,8 @@ using namespace std;
 
 int main()
 {
+	srand((unsigned int)time(nullptr));
+
 	WSAData wsaData;
 	int Result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (Result != 0)
@@ -43,6 +47,7 @@ int main()
 		exit(-1);
 	}
 
+
 	SOCKADDR_IN ClientSockAddr;
 	memset(&ClientSockAddr, 0, sizeof(ClientSockAddr));
 	int ClientSocketAddrLength = sizeof(ClientSockAddr);
@@ -53,8 +58,50 @@ int main()
 		exit(-1);
 	}
 
-	//send/recv
-	
+	while (true)
+	{
+		int FirstNumber = rand() % 10000;
+		int SecondNumber = rand() % 9999 + 1;
+		int OperatorIndex = rand() % 5;
+		char Operator[5] = { '+', '-', '*', '/', '%' };
+
+		char Buffer[1024] = { 0, };
+		sprintf_s(Buffer, 1024, "%d%c%d", FirstNumber, Operator[OperatorIndex], SecondNumber);
+		//		sprintf(Buffer, "%d%c%d", FirstNumber, Operator[OperatorIndex], SecondNumber);
+
+		int SentByte = send(ClientSocket, Buffer, (int)(strlen(Buffer) + 1), 0);
+		if (SentByte < 0)
+		{
+			cout << "Error : " << GetLastError() << endl;
+			continue;
+		}
+		else if (SentByte == 0)
+		{
+			cout << "Disconnected : " << GetLastError() << endl;
+			continue;
+		}
+		else
+		{
+			cout << "Sent byte : " << SentByte << ", " << Buffer << endl;
+		}
+
+		char RecvBuffer[1024] = { 0, };
+		int RecvByte = recv(ClientSocket, RecvBuffer, sizeof(RecvBuffer), 0);
+		if (RecvByte < 0)
+		{
+			cout << "Error : " << GetLastError() << endl;
+			continue;
+		}
+		else if (RecvByte == 0)
+		{
+			cout << "Disconnected : " << GetLastError() << endl;
+			continue;
+		}
+		else
+		{
+			cout << "Recv byte : " << RecvByte << ", " << RecvBuffer << endl;
+		}
+	}
 	closesocket(ClientSocket);
 	closesocket(ListenSocket);
 
